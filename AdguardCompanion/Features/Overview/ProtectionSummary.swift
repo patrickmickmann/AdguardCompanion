@@ -15,11 +15,15 @@ nonisolated enum ProtectionSummary: Equatable {
         } else if !status.isDNSRunning {
             self = .dnsStopped
         } else {
-            switch status.filtering {
-            case .enabled: self = .protected
-            case let .paused(until): self = .paused(until: until)
-            case .disabled: self = .filteringDisabled
-            }
+            self.init(filtering: status.filtering)
+        }
+    }
+
+    init(filtering: FilteringState) {
+        switch filtering {
+        case .enabled: self = .protected
+        case let .paused(until): self = .paused(until: until)
+        case .disabled: self = .filteringDisabled
         }
     }
 

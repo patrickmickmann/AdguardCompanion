@@ -1,5 +1,4 @@
 import Foundation
-import Synchronization
 
 /// DEMO DATA ONLY. Generates deterministic sample data so the app can be
 /// explored without a server. Every screen showing this data is labeled
@@ -8,6 +7,8 @@ struct DemoAdGuardRepository: AdGuardRepository {
     var calendar: Calendar = .current
     /// In-memory user rules so rule changes can be tried out in the demo.
     private let userRules = DemoUserRules()
+    /// In-memory protection switches for the demo.
+    private let protection = DemoProtection()
 
     var isDemo: Bool { true }
 
@@ -22,7 +23,11 @@ struct DemoAdGuardRepository: AdGuardRepository {
             httpPort: 3000,
             startTime: Date.now.addingTimeInterval(-12 * 86_400).timeIntervalSince1970 * 1000
         )
-        return ServerStatusMapper.map(dto, now: .now)
+        let status = ServerStatusMapper.map(dto, now: .now)
+        return ServerStatus(
+            version: status.version, isDNSRunning: status.isDNSRunning, filtering: protection.current().protection,
+            dnsAddresses: status.dnsAddresses, dnsPort: status.dnsPort, startedAt: status.startedAt
+        )
     }
 
     func fetchStatistics() async throws(APIError) -> DashboardStatistics {
@@ -47,11 +52,19 @@ struct DemoAdGuardRepository: AdGuardRepository {
     }
 
     func fetchUserRules() async throws(APIError) -> [String] {
-        userRules.rules.withLock { $0 }
+        userRules.current()
     }
 
     func replaceUserRules(_ rules: [String]) async throws(APIError) {
-        userRules.rules.withLock { $0 = rules }
+        userRules.replace(with: rules)
+    }
+
+    func fetchProtectionSettings() async throws(APIError) -> ProtectionSettings {
+        protection.current()
+    }
+
+    func updateProtection(_ change: ProtectionChange) async throws(APIError) {
+        protection.apply(change)
     }
 
     /// Hourly sample curve with a daytime peak; totals are derived from the series.
@@ -89,13 +102,4 @@ struct DemoAdGuardRepository: AdGuardRepository {
     private static func sample(_ values: KeyValuePairs<String, Double>) -> [[String: Double]] {
         values.sorted { $0.value > $1.value }.map { [$0.key: $0.value] }
     }
-}
-
-/// DEMO DATA ONLY. Shared, lock-protected storage for the demo's user rules.
-private final class DemoUserRules: Sendable {
-    let rules = Mutex<[String]>([
-        "! Demo-Regeln",
-        "||tracking.example.net^$important",
-        "@@||app-measurement.com^$important",
-    ])
 }

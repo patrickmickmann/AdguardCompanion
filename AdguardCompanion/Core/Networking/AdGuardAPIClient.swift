@@ -25,17 +25,25 @@ nonisolated struct AdGuardAPIClient: Sendable {
         }
     }
 
-    /// Performs a POST request with a JSON body. Success means a 2xx status;
-    /// the response body is not interpreted, callers confirm the new server
-    /// state with a subsequent read.
+    /// HTTP methods used for changes.
+    enum WriteMethod: String, Sendable {
+        case post = "POST", put = "PUT"
+    }
+
+    /// Performs a write request with an optional JSON body. Success means a
+    /// 2xx status; the response body is not interpreted, callers confirm the
+    /// new server state with a subsequent read.
     @concurrent
-    func post(_ endpoint: Endpoint, body: some Encodable & Sendable) async throws(APIError) {
-        var request = makeRequest(endpoint, method: "POST")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        do {
-            request.httpBody = try JSONEncoder.adGuard.encode(body)
-        } catch {
-            throw .invalidInput
+    func write(_ endpoint: Endpoint, method: WriteMethod = .post,
+               body: (any Encodable & Sendable)? = nil) async throws(APIError) {
+        var request = makeRequest(endpoint, method: method.rawValue)
+        if let body {
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            do {
+                request.httpBody = try JSONEncoder.adGuard.encode(body)
+            } catch {
+                throw .invalidInput
+            }
         }
         _ = try await send(request)
     }

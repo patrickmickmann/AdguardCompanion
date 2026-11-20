@@ -106,7 +106,7 @@ struct SetRulesRequestTests {
         let client = AdGuardAPIClient(baseURL: try #require(URL(string: "https://\(host)")),
                                       credentials: ServerCredentials(username: "u", password: "p"),
                                       session: StubURLProtocol.makeSession())
-        try await client.post(.setRules, body: SetRulesRequestDTO(rules: ["||a.com^$important"]))
+        try await client.write(.setRules, body: SetRulesRequestDTO(rules: ["||a.com^$important"]))
     }
 
     @Test func decodesUserRulesFromFilteringStatus() throws {

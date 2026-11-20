@@ -53,7 +53,7 @@ struct MainTabView: View {
         case .clients:
             ClientsScreen(repository: connection.repository)
         case .protection:
-            FeaturePreviewScreen(feature: .protection)
+            ProtectionScreen(repository: connection.repository)
         case .settings:
             SettingsScreen(connection: connection)
         }

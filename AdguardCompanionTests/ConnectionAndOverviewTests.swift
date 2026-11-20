@@ -81,7 +81,7 @@ final class StubRepository: AdGuardRepository {
 
     var userRules: [String] = []
     var replacedRules: [[String]] = []
-    /// Simulates a server that accepts `set_rules` without applying it.
+    /// Simulates a server that accepts writes without applying them.
     var ignoresRuleChanges = false
 
     func fetchUserRules() async throws(APIError) -> [String] {
@@ -93,6 +93,28 @@ final class StubRepository: AdGuardRepository {
         if let failure { throw failure }
         replacedRules.append(rules)
         if !ignoresRuleChanges { userRules = rules }
+    }
+
+    var protection = ProtectionSettings(protection: .enabled, safeBrowsing: true, parentalControl: false, safeSearch: false)
+    var protectionChanges: [ProtectionChange] = []
+
+    func fetchProtectionSettings() async throws(APIError) -> ProtectionSettings {
+        if let failure { throw failure }
+        return protection
+    }
+
+    func updateProtection(_ change: ProtectionChange) async throws(APIError) {
+        if let failure { throw failure }
+        protectionChanges.append(change)
+        guard !ignoresRuleChanges else { return }
+        switch change {
+        case .enableProtection: protection.protection = .enabled
+        case let .pauseProtection(pause): protection.protection = .paused(until: .now + pause.duration.timeInterval)
+        case .disableProtection: protection.protection = .disabled
+        case let .safeBrowsing(isOn): protection.safeBrowsing = isOn
+        case let .parentalControl(isOn): protection.parentalControl = isOn
+        case let .safeSearch(isOn): protection.safeSearch = isOn
+        }
     }
 }
 

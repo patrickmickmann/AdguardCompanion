@@ -17,6 +17,8 @@ protocol AdGuardRepository: Sendable {
     func fetchUserRules() async throws(APIError) -> [String]
     /// Replaces all user-defined filtering rules.
     func replaceUserRules(_ rules: [String]) async throws(APIError)
+    func fetchProtectionSettings() async throws(APIError) -> ProtectionSettings
+    func updateProtection(_ change: ProtectionChange) async throws(APIError)
 }
 
 /// Production repository backed by the AdGuard Home REST API.
@@ -74,6 +76,6 @@ struct LiveAdGuardRepository: AdGuardRepository {
     }
 
     func replaceUserRules(_ rules: [String]) async throws(APIError) {
-        try await client.post(.setRules, body: SetRulesRequestDTO(rules: rules))
+        try await client.write(.setRules, body: SetRulesRequestDTO(rules: rules))
     }
 }

@@ -14,6 +14,19 @@ nonisolated struct Endpoint: Sendable, Equatable {
     static let filteringStatus = Endpoint(path: "control/filtering/status")
     /// `POST /control/filtering/set_rules` – replaces all user-defined rules.
     static let setRules = Endpoint(path: "control/filtering/set_rules")
+    /// `POST /control/protection` – enables, pauses or disables protection.
+    static let protection = Endpoint(path: "control/protection")
+    /// `GET /control/safebrowsing/status`, `POST …/enable`, `POST …/disable`.
+    static let safeBrowsingStatus = Endpoint(path: "control/safebrowsing/status")
+    static let safeBrowsingEnable = Endpoint(path: "control/safebrowsing/enable")
+    static let safeBrowsingDisable = Endpoint(path: "control/safebrowsing/disable")
+    /// `GET /control/parental/status`, `POST …/enable`, `POST …/disable`.
+    static let parentalStatus = Endpoint(path: "control/parental/status")
+    static let parentalEnable = Endpoint(path: "control/parental/enable")
+    static let parentalDisable = Endpoint(path: "control/parental/disable")
+    /// `GET /control/safesearch/status` and `PUT /control/safesearch/settings`.
+    static let safeSearchStatus = Endpoint(path: "control/safesearch/status")
+    static let safeSearchSettings = Endpoint(path: "control/safesearch/settings")
     /// `GET /control/clients` – configured and automatically discovered clients.
     static let clients = Endpoint(path: "control/clients")
     /// `GET /control/blocked_services/all` – services available for blocking.
