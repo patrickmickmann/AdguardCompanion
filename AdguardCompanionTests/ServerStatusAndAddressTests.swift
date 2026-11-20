@@ -63,6 +63,20 @@ struct ServerAddressTests {
         #expect(throws: (any Error).self) { try ServerAddress.parse(input) }
     }
 
+    @Test func detectsExplicitScheme() {
+        #expect(ServerAddress.hasExplicitScheme(" http://192.168.1.2"))
+        #expect(!ServerAddress.hasExplicitScheme("192.168.1.2"))
+    }
+
+    @Test @MainActor func suggestsHTTPOnlyWhenSchemeWasImplicit() {
+        let hinted = ConnectionSetupModel.failureMessage(for: .secureConnectionFailed, schemeWasImplicit: true)
+        #expect(hinted.contains("http://"))
+        let explicit = ConnectionSetupModel.failureMessage(for: .secureConnectionFailed, schemeWasImplicit: false)
+        #expect(explicit == APIError.secureConnectionFailed.message)
+        let auth = ConnectionSetupModel.failureMessage(for: .unauthorized, schemeWasImplicit: true)
+        #expect(auth == APIError.unauthorized.message)
+    }
+
     @Test func detectsInsecureScheme() throws {
         #expect(ServerAddress.isInsecure(try ServerAddress.parse("http://host")))
         #expect(!ServerAddress.isInsecure(try ServerAddress.parse("host")))

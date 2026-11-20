@@ -54,7 +54,8 @@ final class ConnectionSetupModel {
             _ = try await appModel.makeRepository(for: configuration, password: password).fetchServerStatus()
         } catch {
             guard error != .cancelled else { return }
-            failure = Failure(title: error.title, message: error.message)
+            let message = Self.failureMessage(for: error, schemeWasImplicit: !ServerAddress.hasExplicitScheme(address))
+            failure = Failure(title: error.title, message: message)
             return
         }
 
@@ -66,6 +67,18 @@ final class ConnectionSetupModel {
                 message: "Die Zugangsdaten konnten nicht im Schlüsselbund gesichert werden."
             )
         }
+    }
+
+    /// Adds a hint when HTTPS was assumed and the connection failed in a way
+    /// that is typical for servers only offering HTTP. Never downgrades silently.
+    static func failureMessage(for error: APIError, schemeWasImplicit: Bool) -> String {
+        let suggestsMissingHTTP: Bool = switch error {
+        case .secureConnectionFailed, .serverUnreachable, .timeout, .transport: true
+        default: false
+        }
+        guard schemeWasImplicit, suggestsMissingHTTP else { return error.message }
+        return error.message
+            + " Ohne Angabe wird HTTPS verwendet. Nutzt dein Server nur HTTP, gib die Adresse mit http:// ein."
     }
 
     private static func message(for error: ServerAddressError) -> String {

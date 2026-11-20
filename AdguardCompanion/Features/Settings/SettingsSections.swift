@@ -78,7 +78,7 @@ struct ConnectionSection: View {
             Button {
                 Task { await testModel.run() }
             } label: {
-                SettingsRow("Verbindung testen", systemImage: "bolt.horizontal.fill", color: AppColor.protection) {
+                SettingsRow("Verbindung testen", systemImage: "checkmark.seal.fill", color: AppColor.protection) {
                     if testModel.state == .testing { ProgressView() }
                 }
             }
@@ -103,9 +103,13 @@ struct ServerInfoSection: View {
                 Text(status.isDNSRunning ? "Läuft" : "Gestoppt")
             }
             if !status.dnsAddresses.isEmpty {
-                SettingsRow("DNS-Adressen", systemImage: "point.3.connected.trianglepath.dotted",
-                            color: AppColor.performance) {
-                    Text(status.dnsAddresses.joined(separator: ", ")).font(AppFont.technicalSmall)
+                NavigationLink {
+                    DNSAddressesScreen(addresses: status.dnsAddresses)
+                } label: {
+                    SettingsRow("DNS-Adressen", systemImage: "point.3.connected.trianglepath.dotted",
+                                color: AppColor.performance) {
+                        Text(status.dnsAddresses.count.formatted())
+                    }
                 }
             }
             if let port = status.dnsPort {

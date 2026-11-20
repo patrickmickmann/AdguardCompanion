@@ -30,6 +30,11 @@ nonisolated enum ServerAddress {
         return url
     }
 
+    /// `true` if the user typed a scheme such as `http://` themselves.
+    static func hasExplicitScheme(_ input: String) -> Bool {
+        input.trimmingCharacters(in: .whitespacesAndNewlines).contains("://")
+    }
+
     /// `true` if requests to this URL would be sent unencrypted.
     static func isInsecure(_ url: URL) -> Bool {
         url.scheme?.lowercased() == "http"
