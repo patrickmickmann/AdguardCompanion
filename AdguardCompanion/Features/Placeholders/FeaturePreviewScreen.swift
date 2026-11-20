@@ -4,11 +4,10 @@ import SwiftUI
 /// It describes what will be available instead of showing fake data.
 struct FeaturePreviewScreen: View {
     enum Feature {
-        case activity, clients, protection
+        case clients, protection
 
         var title: LocalizedStringKey {
             switch self {
-            case .activity: "Aktivität"
             case .clients: "Clients"
             case .protection: "Schutz"
             }
@@ -16,7 +15,6 @@ struct FeaturePreviewScreen: View {
 
         var systemImage: String {
             switch self {
-            case .activity: "list.bullet.rectangle"
             case .clients: "laptopcomputer.and.iphone"
             case .protection: "checkmark.shield"
             }
@@ -24,7 +22,6 @@ struct FeaturePreviewScreen: View {
 
         var headline: LocalizedStringKey {
             switch self {
-            case .activity: "Query-Log in Vorbereitung"
             case .clients: "Client-Verwaltung in Vorbereitung"
             case .protection: "Schutzfunktionen in Vorbereitung"
             }
@@ -32,8 +29,6 @@ struct FeaturePreviewScreen: View {
 
         var details: LocalizedStringKey {
             switch self {
-            case .activity:
-                "Hier durchsuchst und filterst du bald alle DNS-Anfragen deines Netzwerks."
             case .clients:
                 "Hier siehst du bald alle Geräte im Netzwerk und ihre individuellen Regeln."
             case .protection:

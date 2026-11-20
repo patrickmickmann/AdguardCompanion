@@ -49,7 +49,7 @@ struct MainTabView: View {
         case .overview:
             OverviewScreen(repository: connection.repository)
         case .activity:
-            FeaturePreviewScreen(feature: .activity)
+            ActivityScreen(repository: connection.repository)
         case .clients:
             FeaturePreviewScreen(feature: .clients)
         case .protection:

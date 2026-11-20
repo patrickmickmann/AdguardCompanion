@@ -55,6 +55,19 @@ final class StubRepository: AdGuardRepository {
         if let failure { throw failure }
         return try await DemoAdGuardRepository().fetchStatistics()
     }
+
+    var queryLogRequests: [QueryLogQuery] = []
+
+    func fetchQueryLog(_ query: QueryLogQuery) async throws(APIError) -> QueryLogPage {
+        queryLogRequests.append(query)
+        if let failure { throw failure }
+        return try await DemoAdGuardRepository().fetchQueryLog(query)
+    }
+
+    func fetchFilterLists() async throws(APIError) -> FilterListCatalog {
+        if let failure { throw failure }
+        return try await DemoAdGuardRepository().fetchFilterLists()
+    }
 }
 
 @MainActor

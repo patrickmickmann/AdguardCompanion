@@ -8,6 +8,8 @@ protocol AdGuardRepository: Sendable {
 
     func fetchServerStatus() async throws(APIError) -> ServerStatus
     func fetchStatistics() async throws(APIError) -> DashboardStatistics
+    func fetchQueryLog(_ query: QueryLogQuery) async throws(APIError) -> QueryLogPage
+    func fetchFilterLists() async throws(APIError) -> FilterListCatalog
 }
 
 /// Production repository backed by the AdGuard Home REST API.
@@ -25,5 +27,15 @@ struct LiveAdGuardRepository: AdGuardRepository {
     func fetchStatistics() async throws(APIError) -> DashboardStatistics {
         let dto: StatsDTO = try await client.get(.stats)
         return StatisticsMapper.map(dto, now: .now, calendar: calendar)
+    }
+
+    func fetchQueryLog(_ query: QueryLogQuery) async throws(APIError) -> QueryLogPage {
+        let dto: QueryLogDTO = try await client.get(.queryLog(query))
+        return QueryLogMapper.map(dto, requestedLimit: query.limit)
+    }
+
+    func fetchFilterLists() async throws(APIError) -> FilterListCatalog {
+        let dto: FilterStatusDTO = try await client.get(.filteringStatus)
+        return FilterListCatalog(dto)
     }
 }

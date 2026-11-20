@@ -26,6 +26,14 @@ struct DemoAdGuardRepository: AdGuardRepository {
         StatisticsMapper.map(Self.sampleStats(), now: .now, calendar: calendar)
     }
 
+    func fetchQueryLog(_ query: QueryLogQuery) async throws(APIError) -> QueryLogPage {
+        DemoQueryLog.page(for: query, now: .now)
+    }
+
+    func fetchFilterLists() async throws(APIError) -> FilterListCatalog {
+        DemoQueryLog.catalog
+    }
+
     /// Hourly sample curve with a daytime peak; totals are derived from the series.
     static func sampleStats() -> StatsDTO {
         let hours = 0..<24
