@@ -35,7 +35,6 @@ struct ConnectionSetupScreen: View {
                     Text("Adresse der AdGuard-Home-Weboberfläche, inklusive Port.")
                 }
             }
-            .listRowBackground(AppColor.surface)
 
             Section {
                 TextField("Benutzername", text: $model.username)
@@ -55,7 +54,6 @@ struct ConnectionSetupScreen: View {
             } footer: {
                 Text("Zugangsdaten werden ausschließlich im Schlüsselbund dieses iPhones gespeichert.")
             }
-            .listRowBackground(AppColor.surface)
 
             if let failure = model.failure {
                 Section {
@@ -68,11 +66,8 @@ struct ConnectionSetupScreen: View {
                         Image(systemName: "xmark.octagon.fill").foregroundStyle(AppColor.blocked)
                     }
                 }
-                .listRowBackground(AppColor.surface)
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(AppColor.background)
         .navigationTitle("Verbinden")
         .navigationBarTitleDisplayMode(.large)
         .safeAreaInset(edge: .bottom) { connectButton }
@@ -81,16 +76,22 @@ struct ConnectionSetupScreen: View {
 
     private var connectButton: some View {
         Button(action: submit) {
-            if model.isVerifying {
-                ProgressView().tint(AppColor.onProtection)
-            } else {
-                Text("Verbindung prüfen und speichern")
+            Group {
+                if model.isVerifying {
+                    ProgressView().tint(.white)
+                } else {
+                    Text("Verbinden")
+                }
             }
+            .font(.headline)
+            .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.primary)
+        .buttonStyle(.glassProminent)
+        .controlSize(.extraLarge)
         .disabled(!model.canSubmit)
-        .padding(.horizontal, Spacing.l)
+        .padding(.horizontal, Spacing.xl)
         .padding(.bottom, Spacing.s)
+        .frame(maxWidth: Metrics.readableWidth)
         .accessibilityLabel(model.isVerifying ? "Verbindung wird geprüft" : "Verbindung prüfen und speichern")
     }
 

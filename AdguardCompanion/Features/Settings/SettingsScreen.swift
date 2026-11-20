@@ -16,7 +16,10 @@ struct SettingsScreen: View {
 
     var body: some View {
         List {
-            ConnectionSection(connection: connection, testModel: testModel)
+            ServerIdentitySection(connection: connection, testModel: testModel)
+            if !connection.isDemo {
+                ConnectionSection(connection: connection, testModel: testModel)
+            }
             if let status = testModel.status {
                 ServerInfoSection(status: status, isDemo: connection.isDemo)
             }
@@ -35,11 +38,8 @@ struct SettingsScreen: View {
                      ? "Beendet den Demo-Modus und führt zurück zur Einrichtung."
                      : "Entfernt Serveradresse und Zugangsdaten von diesem iPhone. Am Server wird nichts verändert.")
             }
-            .listRowBackground(AppColor.surface)
         }
-        .scrollContentBackground(.hidden)
-        .background(AppColor.background)
-        .navigationTitle("Settings")
+        .navigationTitle("Einstellungen")
         .task { await testModel.run() }
         .alert("Trennen fehlgeschlagen", isPresented: $disconnectFailed) {
             Button("OK", role: .cancel) {}

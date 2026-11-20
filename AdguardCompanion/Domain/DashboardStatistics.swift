@@ -62,4 +62,16 @@ nonisolated struct DashboardStatistics: Equatable, Sendable {
     }
 
     var hasTraffic: Bool { traffic.contains { $0.total > 0 } }
+
+    /// Mean number of queries per time slot, or `nil` without traffic data.
+    var averageQueriesPerBucket: Double? {
+        guard !traffic.isEmpty else { return nil }
+        return Double(traffic.reduce(0) { $0 + $1.total }) / Double(traffic.count)
+    }
+
+    /// The time slot containing `date`, used for chart scrubbing.
+    func bucket(containing date: Date) -> TrafficBucket? {
+        guard let first = traffic.first, date >= first.start else { return nil }
+        return traffic.last { $0.start <= date }
+    }
 }

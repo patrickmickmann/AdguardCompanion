@@ -8,11 +8,11 @@ enum AppTab: String, CaseIterable, Identifiable {
 
     var title: LocalizedStringKey {
         switch self {
-        case .overview: "Overview"
-        case .activity: "Activity"
+        case .overview: "Übersicht"
+        case .activity: "Aktivität"
         case .clients: "Clients"
-        case .protection: "Protection"
-        case .settings: "Settings"
+        case .protection: "Schutz"
+        case .settings: "Einstellungen"
         }
     }
 

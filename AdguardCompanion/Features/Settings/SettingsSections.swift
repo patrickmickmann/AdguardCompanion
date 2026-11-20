@@ -1,59 +1,90 @@
 import SwiftUI
 
-/// Connection parameters and the connection test result.
+/// Prominent first row, like the Apple Account row in the Settings app.
+struct ServerIdentitySection: View {
+    let connection: ActiveConnection
+    let testModel: ConnectionTestModel
+
+    @ScaledMetric(relativeTo: .title) private var iconSize: CGFloat = 56
+
+    var body: some View {
+        Section {
+            HStack(spacing: Spacing.l) {
+                Image(systemName: "server.rack")
+                    .font(.system(size: iconSize * 0.45, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: iconSize, height: iconSize)
+                    .background(AppColor.protection.gradient, in: .circle)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: Spacing.xxs) {
+                    Text(connection.isDemo ? "Demo-Server" : "AdGuard Home")
+                        .font(.title3.weight(.semibold))
+                    Text(connection.configuration?.baseURL.host() ?? "Beispieldaten")
+                        .font(connection.isDemo ? .footnote : AppFont.technicalSmall)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    statusLabel
+                }
+            }
+            .padding(.vertical, Spacing.xs)
+            .accessibilityElement(children: .combine)
+        }
+    }
+
+    @ViewBuilder
+    private var statusLabel: some View {
+        if connection.isDemo {
+            StatusLabel(text: "Keine Serververbindung", tone: .neutral)
+        } else {
+            switch testModel.state {
+            case .idle, .testing:
+                StatusLabel(text: "Wird geprüft …", tone: .neutral)
+            case let .succeeded(_, latency):
+                StatusLabel(text: "Verbunden · \(latency.formattedMilliseconds) ms", tone: .positive)
+            case let .failed(error):
+                StatusLabel(text: error.title, tone: .critical)
+            }
+        }
+    }
+}
+
+/// Connection parameters and the connection test action.
 struct ConnectionSection: View {
     let connection: ActiveConnection
     let testModel: ConnectionTestModel
 
     var body: some View {
-        Section("Verbindung") {
+        Section {
             if let configuration = connection.configuration {
-                LabeledContent("Server") {
+                SettingsRow("Adresse", systemImage: "link", color: AppColor.network) {
                     Text(configuration.baseURL.absoluteString)
                         .font(AppFont.technicalSmall)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
-                LabeledContent("Benutzer", value: configuration.username)
-                if ServerAddress.isInsecure(configuration.baseURL) {
-                    Label("Unverschlüsselt (HTTP)", systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(AppColor.warning)
+                SettingsRow("Benutzer", systemImage: "person.fill", color: .gray) {
+                    Text(configuration.username)
                 }
-            } else {
-                LabeledContent("Modus", value: "Demo mit Beispieldaten")
-                LabeledContent("Status") { StatusLabel(text: "Keine Serververbindung", tone: .neutral) }
+                if ServerAddress.isInsecure(configuration.baseURL) {
+                    SettingsRow("Unverschlüsselt (HTTP)", systemImage: "exclamationmark.triangle.fill",
+                                color: AppColor.warning) { EmptyView() }
+                }
             }
-            // A connection test is only meaningful against a real server.
-            if !connection.isDemo {
-                testRow
-                Button("Verbindung testen") { Task { await testModel.run() } }
-                    .disabled(testModel.state == .testing)
-            }
-        }
-        .listRowBackground(AppColor.surface)
-    }
-
-    @ViewBuilder
-    private var testRow: some View {
-        switch testModel.state {
-        case .idle:
-            EmptyView()
-        case .testing:
-            LabeledContent("Status") { ProgressView() }
-        case let .succeeded(_, latency):
-            LabeledContent("Status") {
-                StatusLabel(
-                    text: "Verbunden · \(latency.formatted(.units(allowed: [.milliseconds], width: .abbreviated)))",
-                    tone: .positive
-                )
-            }
-        case let .failed(error):
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                StatusLabel(text: error.title, tone: .critical)
+            if case let .failed(error) = testModel.state {
                 Text(error.message)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
+            Button {
+                Task { await testModel.run() }
+            } label: {
+                SettingsRow("Verbindung testen", systemImage: "bolt.horizontal.fill", color: AppColor.protection) {
+                    if testModel.state == .testing { ProgressView() }
+                }
+            }
+            .disabled(testModel.state == .testing)
+        } header: {
+            Text("Verbindung")
         }
     }
 }
@@ -65,22 +96,28 @@ struct ServerInfoSection: View {
 
     var body: some View {
         Section(isDemo ? "Server (Beispieldaten)" : "Server") {
-            LabeledContent("Version") {
+            SettingsRow("Version", systemImage: "info", color: .gray) {
                 Text(status.version ?? "Unbekannt").font(AppFont.technicalSmall)
             }
-            LabeledContent("DNS-Server", value: status.isDNSRunning ? "Läuft" : "Gestoppt")
+            SettingsRow("DNS-Server", systemImage: "network", color: AppColor.network) {
+                Text(status.isDNSRunning ? "Läuft" : "Gestoppt")
+            }
             if !status.dnsAddresses.isEmpty {
-                LabeledContent("DNS-Adressen") {
+                SettingsRow("DNS-Adressen", systemImage: "point.3.connected.trianglepath.dotted",
+                            color: AppColor.performance) {
                     Text(status.dnsAddresses.joined(separator: ", ")).font(AppFont.technicalSmall)
                 }
             }
             if let port = status.dnsPort {
-                LabeledContent("DNS-Port") { Text(String(port)).font(AppFont.technicalSmall) }
+                SettingsRow("DNS-Port", systemImage: "number", color: Color(uiColor: .systemIndigo)) {
+                    Text(String(port)).font(AppFont.technicalSmall)
+                }
             }
             if let startedAt = status.startedAt {
-                LabeledContent("Gestartet", value: startedAt.formatted(.relative(presentation: .named)))
+                SettingsRow("Gestartet", systemImage: "clock.fill", color: AppColor.warning) {
+                    Text(startedAt.formatted(.relative(presentation: .named)))
+                }
             }
         }
-        .listRowBackground(AppColor.surface)
     }
 }

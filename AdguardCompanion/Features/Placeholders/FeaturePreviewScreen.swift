@@ -8,9 +8,9 @@ struct FeaturePreviewScreen: View {
 
         var title: LocalizedStringKey {
             switch self {
-            case .activity: "Activity"
+            case .activity: "Aktivität"
             case .clients: "Clients"
-            case .protection: "Protection"
+            case .protection: "Schutz"
             }
         }
 
