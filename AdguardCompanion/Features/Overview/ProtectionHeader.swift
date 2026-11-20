@@ -1,41 +1,43 @@
 import SwiftUI
 
-/// Hero at the top of the Overview: one glance answers "Is my network protected?"
+/// Compact status card at the top of the Overview: answers "Is my network
+/// protected?" in one line, leaving the screen to the traffic data below.
 struct ProtectionHeader: View {
     let summary: ProtectionSummary
     let version: String?
     let isDemo: Bool
 
-    @ScaledMetric(relativeTo: .largeTitle) private var symbolSize: CGFloat = 64
+    @ScaledMetric(relativeTo: .title) private var symbolSize: CGFloat = 40
 
     var body: some View {
-        VStack(spacing: Spacing.s) {
-            Image(systemName: summary.systemImage)
-                .font(.system(size: symbolSize, weight: .regular))
-                .symbolRenderingMode(.palette)
-                .foregroundStyle(.white, summary.tone.color.gradient)
-                .contentTransition(.symbolEffect(.replace))
-                .shadow(color: summary.tone.color.opacity(0.3), radius: 12, y: 4)
-                .padding(.bottom, Spacing.xs)
-                .accessibilityHidden(true)
+        SurfaceCard(padding: Spacing.m) {
+            HStack(spacing: Spacing.m) {
+                Image(systemName: summary.systemImage)
+                    .font(.system(size: symbolSize))
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(.white, summary.tone.color.gradient)
+                    .contentTransition(.symbolEffect(.replace))
+                    .frame(width: symbolSize * 1.1)
+                    .accessibilityHidden(true)
 
-            Text(summary.title)
-                .font(.title2.bold())
-            Text(summary.detail)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            if isDemo {
-                DemoBadge()
-                    .padding(.top, Spacing.xs)
-            } else if let version {
-                Text("AdGuard Home \(version)")
-                    .font(.footnote)
-                    .foregroundStyle(.tertiary)
+                VStack(alignment: .leading, spacing: Spacing.xxs) {
+                    Text(summary.title)
+                        .font(.headline)
+                    Text(summary.detail)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    if isDemo {
+                        DemoBadge()
+                            .padding(.top, Spacing.xs)
+                    } else if let version {
+                        Text("AdGuard Home \(version)")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .multilineTextAlignment(.center)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, Spacing.m)
         .accessibilityElement(children: .combine)
         .animation(.smooth, value: summary)
     }
