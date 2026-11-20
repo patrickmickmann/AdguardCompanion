@@ -3,15 +3,27 @@ import SwiftUI
 /// Query log with native search, a filter menu and endless scrolling.
 struct ActivityScreen: View {
     @State private var model: ActivityModel
+    private let title: String?
 
-    init(repository: any AdGuardRepository) {
-        _model = State(initialValue: ActivityModel(repository: repository))
+    /// - Parameters:
+    ///   - initialSearch: Pre-filled search, e.g. a client's IP address.
+    ///   - title: Title when opened for a specific device; the search field is
+    ///     then kept visible so the active filter is always apparent.
+    init(repository: any AdGuardRepository, initialSearch: String = "", title: String? = nil) {
+        let model = ActivityModel(repository: repository)
+        model.searchText = initialSearch
+        _model = State(initialValue: model)
+        self.title = title
     }
 
     var body: some View {
         content
-            .navigationTitle("Aktivität")
-            .searchable(text: $model.searchText, prompt: "Domain oder Client-IP")
+            .navigationTitle(title ?? String(localized: "Aktivität"))
+            .searchable(
+                text: $model.searchText,
+                placement: .navigationBarDrawer(displayMode: title == nil ? .automatic : .always),
+                prompt: "Domain oder Client-IP"
+            )
             .autocorrectionDisabled()
             .textInputAutocapitalization(.never)
             .toolbar {

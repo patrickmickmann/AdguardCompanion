@@ -66,10 +66,10 @@ nonisolated enum DemoQueryLog {
     private static func matches(_ item: QueryLogItemDTO, query: QueryLogQuery) -> Bool {
         let reasons = query.filter.reasons
         if !reasons.isEmpty, !reasons.contains(item.reason ?? "") { return false }
-        let term = query.trimmedSearch.lowercased()
+        let (term, isExact) = QueryLogQuery.parse(query.trimmedSearch.lowercased())
         guard !term.isEmpty else { return true }
         return [item.question?.name, item.client, item.clientInfo?.name]
             .compactMap { $0?.lowercased() }
-            .contains { $0.contains(term) }
+            .contains { isExact ? $0 == term : $0.contains(term) }
     }
 }

@@ -10,6 +10,9 @@ protocol AdGuardRepository: Sendable {
     func fetchStatistics() async throws(APIError) -> DashboardStatistics
     func fetchQueryLog(_ query: QueryLogQuery) async throws(APIError) -> QueryLogPage
     func fetchFilterLists() async throws(APIError) -> FilterListCatalog
+    func fetchClients() async throws(APIError) -> [NetworkClient]
+    /// Blocked service names by ID, e.g. "youtube" → "YouTube".
+    func fetchBlockedServiceNames() async throws(APIError) -> [String: String]
 }
 
 /// Production repository backed by the AdGuard Home REST API.
@@ -37,5 +40,27 @@ struct LiveAdGuardRepository: AdGuardRepository {
     func fetchFilterLists() async throws(APIError) -> FilterListCatalog {
         let dto: FilterStatusDTO = try await client.get(.filteringStatus)
         return FilterListCatalog(dto)
+    }
+
+    func fetchClients() async throws(APIError) -> [NetworkClient] {
+        async let clients: ClientsDTO = client.get(.clients)
+        async let stats: StatsDTO = client.get(.stats)
+        do {
+            let topClients = StatisticsMapper.ranked(try await stats.topClients)
+            return ClientsMapper.map(try await clients, topClients: topClients)
+        } catch {
+            // `async let` erases the typed error; both calls only throw APIError.
+            throw APIError(error)
+        }
+    }
+
+    func fetchBlockedServiceNames() async throws(APIError) -> [String: String] {
+        let dto: BlockedServicesAllDTO = try await client.get(.blockedServices)
+        var names: [String: String] = [:]
+        for service in dto.blockedServices ?? [] {
+            guard let id = service.id, let name = service.name else { continue }
+            names[id] = name
+        }
+        return names
     }
 }

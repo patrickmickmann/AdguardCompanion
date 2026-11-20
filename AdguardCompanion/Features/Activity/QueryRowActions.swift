@@ -11,7 +11,7 @@ private struct QueryRowActions: ViewModifier {
         content
             .swipeActions(edge: .leading) {
                 Button {
-                    model.search(for: entry.domain)
+                    model.search(for: QueryLogQuery.exactTerm(entry.domain))
                 } label: {
                     Label("Domain anzeigen", systemImage: "line.3.horizontal.decrease")
                 }
@@ -28,11 +28,11 @@ private struct QueryRowActions: ViewModifier {
             .contextMenu {
                 Section {
                     Button("Nur diese Domain anzeigen", systemImage: "globe") {
-                        model.search(for: entry.domain)
+                        model.search(for: QueryLogQuery.exactTerm(entry.domain))
                     }
                     if !entry.client.address.isEmpty {
                         Button("Nur dieses Gerät anzeigen", systemImage: "desktopcomputer") {
-                            model.search(for: entry.client.address)
+                            model.search(for: QueryLogQuery.exactTerm(entry.client.address))
                         }
                     }
                 }

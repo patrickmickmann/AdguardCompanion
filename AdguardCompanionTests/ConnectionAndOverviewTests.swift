@@ -68,6 +68,16 @@ final class StubRepository: AdGuardRepository {
         if let failure { throw failure }
         return try await DemoAdGuardRepository().fetchFilterLists()
     }
+
+    func fetchClients() async throws(APIError) -> [NetworkClient] {
+        if let failure { throw failure }
+        return try await DemoAdGuardRepository().fetchClients()
+    }
+
+    func fetchBlockedServiceNames() async throws(APIError) -> [String: String] {
+        if let failure { throw failure }
+        return try await DemoAdGuardRepository().fetchBlockedServiceNames()
+    }
 }
 
 @MainActor

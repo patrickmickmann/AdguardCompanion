@@ -34,6 +34,15 @@ struct DemoAdGuardRepository: AdGuardRepository {
         DemoQueryLog.catalog
     }
 
+    func fetchClients() async throws(APIError) -> [NetworkClient] {
+        let top = StatisticsMapper.ranked(Self.sampleStats().topClients)
+        return ClientsMapper.map(DemoClients.clients, topClients: top)
+    }
+
+    func fetchBlockedServiceNames() async throws(APIError) -> [String: String] {
+        DemoClients.serviceNames
+    }
+
     /// Hourly sample curve with a daytime peak; totals are derived from the series.
     static func sampleStats() -> StatsDTO {
         let hours = 0..<24
