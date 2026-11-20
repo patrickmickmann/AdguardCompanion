@@ -173,10 +173,10 @@
 				};
 			};
 			buildConfigurationList = 9291DD0030B05554006FAEB9 /* Build configuration list for PBXProject "AdguardCompanion" */;
-			developmentRegion = en;
+			developmentRegion = de;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
+				de,
 				Base,
 			);
 			mainGroup = 9291DCFC30B05554006FAEB9;
@@ -373,7 +373,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Config/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "AdGuard Companion";
+				INFOPLIST_KEY_CFBundleDisplayName = AdGuard;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "AdGuard Companion verbindet sich mit deinem AdGuard-Home-Server im lokalen Netzwerk.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -408,7 +408,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Config/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "AdGuard Companion";
+				INFOPLIST_KEY_CFBundleDisplayName = AdGuard;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "AdGuard Companion verbindet sich mit deinem AdGuard-Home-Server im lokalen Netzwerk.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
