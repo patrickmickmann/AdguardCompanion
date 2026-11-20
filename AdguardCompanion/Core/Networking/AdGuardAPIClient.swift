@@ -25,6 +25,18 @@ nonisolated struct AdGuardAPIClient: Sendable {
         }
     }
 
+    /// GET for configuration objects that are edited and sent back whole.
+    /// Decoded without key conversion so field names stay exactly as sent.
+    @concurrent
+    func getDocument(_ endpoint: Endpoint) async throws(APIError) -> JSONObject {
+        let data = try await send(makeRequest(endpoint, method: "GET"))
+        do {
+            return try JSONDecoder().decode(JSONObject.self, from: data)
+        } catch {
+            throw .decodingFailed
+        }
+    }
+
     /// HTTP methods used for changes.
     enum WriteMethod: String, Sendable {
         case post = "POST", put = "PUT"

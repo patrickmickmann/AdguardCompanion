@@ -50,4 +50,5 @@ nonisolated struct BlockedServicesAllDTO: Decodable, Sendable {
 nonisolated struct BlockedServiceDTO: Decodable, Sendable {
     let id: String?
     let name: String?
+    var groupId: String? = nil
 }

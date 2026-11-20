@@ -20,6 +20,7 @@ struct SettingsScreen: View {
             if !connection.isDemo {
                 ConnectionSection(connection: connection, testModel: testModel)
             }
+            ServerConfigurationSection(repository: connection.repository)
             if let status = testModel.status {
                 ServerInfoSection(status: status, isDemo: connection.isDemo)
             }

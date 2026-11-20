@@ -141,6 +141,74 @@ final class StubRepository: AdGuardRepository {
         if let failure { throw failure }
         return kind == .blocklist ? 2 : 1
     }
+
+    /// Administration features are backed by in-memory demo state; writes
+    /// are dropped while `ignoresRuleChanges` is set.
+    let administration = DemoAdGuardRepository()
+
+    func fetchRewrites() async throws(APIError) -> DNSRewriteSettings {
+        if let failure { throw failure }
+        return try await administration.fetchRewrites()
+    }
+
+    func updateRewrites(_ change: DNSRewriteChange) async throws(APIError) {
+        if let failure { throw failure }
+        guard !ignoresRuleChanges else { return }
+        try await administration.updateRewrites(change)
+    }
+
+    func fetchBlockedServices() async throws(APIError) -> BlockedServices {
+        if let failure { throw failure }
+        return try await administration.fetchBlockedServices()
+    }
+
+    func setBlockedServices(_ ids: Set<String>, keeping current: BlockedServices) async throws(APIError) {
+        if let failure { throw failure }
+        guard !ignoresRuleChanges else { return }
+        try await administration.setBlockedServices(ids, keeping: current)
+    }
+
+    func fetchLogSettings(_ kind: LogKind) async throws(APIError) -> LogSettings {
+        if let failure { throw failure }
+        return try await administration.fetchLogSettings(kind)
+    }
+
+    func updateLogSettings(_ settings: LogSettings) async throws(APIError) {
+        if let failure { throw failure }
+        guard !ignoresRuleChanges else { return }
+        try await administration.updateLogSettings(settings)
+    }
+
+    func fetchDNSSettings() async throws(APIError) -> DNSSettings {
+        if let failure { throw failure }
+        return try await administration.fetchDNSSettings()
+    }
+
+    func updateDNSSettings(_ patch: JSONObject) async throws(APIError) {
+        if let failure { throw failure }
+        guard !ignoresRuleChanges else { return }
+        try await administration.updateDNSSettings(patch)
+    }
+
+    var upstreamTestResult: [String: String]?
+
+    func testUpstreams(_ upstreams: UpstreamSet) async throws(APIError) -> [String: String] {
+        if let failure { throw failure }
+        if let upstreamTestResult { return upstreamTestResult }
+        return try await administration.testUpstreams(upstreams)
+    }
+
+    func fetchTLSStatus() async throws(APIError) -> TLSStatus {
+        if let failure { throw failure }
+        return try await administration.fetchTLSStatus()
+    }
+
+    var clearedLogs: [LogKind] = []
+
+    func clearLogData(_ kind: LogKind) async throws(APIError) {
+        if let failure { throw failure }
+        clearedLogs.append(kind)
+    }
 }
 
 @MainActor

@@ -43,15 +43,18 @@ struct ProtectionScreen: View {
                 }
                 ProtectionStatusSection(settings: settings, model: model)
                 ProtectionFeaturesSection(isProtectionOn: settings.protection == .enabled, model: model)
-                Section("Filter") {
-                    NavigationLink {
+                Section("Filter und Regeln") {
+                    IconNavigationLink("Filterlisten", systemImage: "list.bullet.rectangle.fill", color: AppColor.protection) {
                         FilterListsScreen(repository: repository)
-                    } label: {
-                        Label {
-                            Text("Filterlisten")
-                        } icon: {
-                            IconTile(systemImage: "list.bullet.rectangle.fill", color: AppColor.protection)
-                        }
+                    }
+                    IconNavigationLink("Eigene Regeln", systemImage: "text.badge.checkmark", color: AppColor.network) {
+                        UserRulesScreen(repository: repository)
+                    }
+                    IconNavigationLink("Gesperrte Dienste", systemImage: "nosign", color: AppColor.blocked) {
+                        BlockedServicesScreen(repository: repository)
+                    }
+                    IconNavigationLink("DNS-Rewrites", systemImage: "arrow.triangle.branch", color: AppColor.performance) {
+                        DNSRewritesScreen(repository: repository)
                     }
                 }
             }

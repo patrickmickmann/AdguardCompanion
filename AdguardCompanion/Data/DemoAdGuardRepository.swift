@@ -10,6 +10,10 @@ struct DemoAdGuardRepository: AdGuardRepository {
     /// In-memory protection switches for the demo.
     private let protection = DemoProtection()
     private let filterLists = DemoFilterLists()
+    let rewrites = DemoRewrites()
+    let blockedServices = DemoBlockedServices()
+    let logSettings = DemoLogSettings()
+    let dnsSettings = DemoDNSSettings()
 
     var isDemo: Bool { true }
 

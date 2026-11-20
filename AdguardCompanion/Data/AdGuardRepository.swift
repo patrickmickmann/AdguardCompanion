@@ -24,6 +24,23 @@ protocol AdGuardRepository: Sendable {
     func updateFilterLists(_ change: FilterListChange, current: FilterListSettings) async throws(APIError)
     /// Returns how many lists were updated.
     func refreshFilterLists(_ kind: FilterList.Kind) async throws(APIError) -> Int
+    func fetchRewrites() async throws(APIError) -> DNSRewriteSettings
+    func updateRewrites(_ change: DNSRewriteChange) async throws(APIError)
+    func fetchBlockedServices() async throws(APIError) -> BlockedServices
+    /// Replaces the set of globally blocked services; the schedule is kept.
+    func setBlockedServices(_ ids: Set<String>, keeping current: BlockedServices) async throws(APIError)
+    func fetchLogSettings(_ kind: LogKind) async throws(APIError) -> LogSettings
+    /// Sends the complete configuration object back with the edited fields.
+    func updateLogSettings(_ settings: LogSettings) async throws(APIError)
+    /// Deletes the query log or resets the statistics.
+    func clearLogData(_ kind: LogKind) async throws(APIError)
+    func fetchDNSSettings() async throws(APIError) -> DNSSettings
+    /// Sends only the given fields; the server leaves all others unchanged.
+    func updateDNSSettings(_ patch: JSONObject) async throws(APIError)
+    /// Asks AdGuard Home to resolve a test name via each upstream.
+    /// Returns the server's result per upstream ("OK" or an error text).
+    func testUpstreams(_ upstreams: UpstreamSet) async throws(APIError) -> [String: String]
+    func fetchTLSStatus() async throws(APIError) -> TLSStatus
 }
 
 /// Production repository backed by the AdGuard Home REST API.
