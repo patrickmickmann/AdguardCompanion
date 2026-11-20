@@ -1,0 +1,12 @@
+# Local-only artifacts (mockups, screenshots, logs, experiments)
+localonly/
+
+# Xcode
+xcuserdata/
+DerivedData/
+build/
+*.xcresult
+*.xcuserstate
+
+# macOS
+.DS_Store
