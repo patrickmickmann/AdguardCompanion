@@ -39,7 +39,7 @@ extension DomainRuleChange {
         switch self {
         case .block: AppColor.blocked
         case .allow: AppColor.protection
-        case .remove: .accentColor
+        case .remove: AppColor.network
         }
     }
 
