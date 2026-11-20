@@ -78,6 +78,22 @@ final class StubRepository: AdGuardRepository {
         if let failure { throw failure }
         return try await DemoAdGuardRepository().fetchBlockedServiceNames()
     }
+
+    var userRules: [String] = []
+    var replacedRules: [[String]] = []
+    /// Simulates a server that accepts `set_rules` without applying it.
+    var ignoresRuleChanges = false
+
+    func fetchUserRules() async throws(APIError) -> [String] {
+        if let failure { throw failure }
+        return userRules
+    }
+
+    func replaceUserRules(_ rules: [String]) async throws(APIError) {
+        if let failure { throw failure }
+        replacedRules.append(rules)
+        if !ignoresRuleChanges { userRules = rules }
+    }
 }
 
 @MainActor

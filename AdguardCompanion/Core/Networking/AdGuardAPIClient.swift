@@ -17,11 +17,38 @@ nonisolated struct AdGuardAPIClient: Sendable {
     /// Performs a GET request and decodes the JSON response off the main actor.
     @concurrent
     func get<Response: Decodable & Sendable>(_ endpoint: Endpoint) async throws(APIError) -> Response {
+        let data = try await send(makeRequest(endpoint, method: "GET"))
+        do {
+            return try JSONDecoder.adGuard.decode(Response.self, from: data)
+        } catch {
+            throw .decodingFailed
+        }
+    }
+
+    /// Performs a POST request with a JSON body. Success means a 2xx status;
+    /// the response body is not interpreted, callers confirm the new server
+    /// state with a subsequent read.
+    @concurrent
+    func post(_ endpoint: Endpoint, body: some Encodable & Sendable) async throws(APIError) {
+        var request = makeRequest(endpoint, method: "POST")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        do {
+            request.httpBody = try JSONEncoder.adGuard.encode(body)
+        } catch {
+            throw .invalidInput
+        }
+        _ = try await send(request)
+    }
+
+    private func makeRequest(_ endpoint: Endpoint, method: String) -> URLRequest {
         var request = URLRequest(url: endpoint.url(relativeTo: baseURL))
-        request.httpMethod = "GET"
+        request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(credentials.authorizationHeaderValue, forHTTPHeaderField: "Authorization")
+        return request
+    }
 
+    private func send(_ request: URLRequest) async throws(APIError) -> Data {
         let data: Data
         let response: URLResponse
         do {
@@ -30,11 +57,7 @@ nonisolated struct AdGuardAPIClient: Sendable {
             throw APIError(error)
         }
         try Self.validate(response: response, data: data)
-        do {
-            return try JSONDecoder.adGuard.decode(Response.self, from: data)
-        } catch {
-            throw .decodingFailed
-        }
+        return data
     }
 
     /// Maps non-success HTTP responses to `APIError`.
@@ -49,6 +72,14 @@ nonisolated struct AdGuardAPIClient: Sendable {
             let body = try? JSONDecoder.adGuard.decode(ErrorDTO.self, from: data)
             throw .http(statusCode: http.statusCode, message: body?.message)
         }
+    }
+}
+
+nonisolated extension JSONEncoder {
+    static var adGuard: JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        return encoder
     }
 }
 

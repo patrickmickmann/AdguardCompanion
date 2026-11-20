@@ -22,6 +22,10 @@ nonisolated enum APIError: Error, Equatable, Sendable {
     case decodingFailed
     /// The request was cancelled, e.g. because the screen disappeared.
     case cancelled
+    /// A write request was rejected locally because its input is invalid.
+    case invalidInput
+    /// The server accepted a change, but reading it back did not show it.
+    case changeNotConfirmed
     /// Any other transport failure.
     case transport(code: Int)
 

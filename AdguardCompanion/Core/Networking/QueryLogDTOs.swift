@@ -65,6 +65,12 @@ nonisolated struct FilterStatusDTO: Decodable, Sendable {
     let enabled: Bool?
     let filters: [FilterDTO]?
     let whitelistFilters: [FilterDTO]?
+    let userRules: [String]?
+}
+
+/// `components/schemas/SetRulesRequest`
+nonisolated struct SetRulesRequestDTO: Encodable, Sendable {
+    let rules: [String]
 }
 
 /// `components/schemas/Filter`

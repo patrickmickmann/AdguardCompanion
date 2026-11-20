@@ -12,6 +12,8 @@ extension APIError {
         case .http: "Serverfehler"
         case .invalidResponse, .decodingFailed: "Unerwartete Antwort"
         case .cancelled: "Abgebrochen"
+        case .invalidInput: "Ungültige Eingabe"
+        case .changeNotConfirmed: "Änderung nicht bestätigt"
         case .transport: "Verbindungsfehler"
         }
     }
@@ -35,6 +37,10 @@ extension APIError {
             "Die Antwort entspricht nicht dem erwarteten AdGuard-Home-Format. Ist die Adresse korrekt?"
         case .cancelled:
             "Die Anfrage wurde abgebrochen."
+        case .invalidInput:
+            "Die Änderung wurde nicht gesendet, weil die Eingabe ungültig ist."
+        case .changeNotConfirmed:
+            "AdGuard Home hat die Anfrage angenommen, die Änderung ist aber nicht sichtbar. Lade die Ansicht neu."
         case let .transport(code):
             "Die Anfrage ist fehlgeschlagen (Code \(code))."
         }

@@ -104,6 +104,10 @@ final class ActivityModel {
         }
     }
 
+    func makeRuleModel(for entry: QueryLogEntry) -> DomainRuleModel {
+        DomainRuleModel(domain: entry.domain, repository: repository, prefersAllow: entry.outcome.isBlocked)
+    }
+
     /// Loads filter list names once for the detail view. Failure is surfaced
     /// via `catalogError`; the detail view then falls back to list IDs.
     func loadCatalogIfNeeded() async {

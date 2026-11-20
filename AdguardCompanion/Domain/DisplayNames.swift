@@ -33,6 +33,13 @@ nonisolated struct DomainDisplayParts: Equatable, Sendable {
         let prefix = labels.dropLast(baseCount).joined(separator: ".") + "."
         self.init(prefix: prefix, base: base)
     }
+
+    /// The domain with invisible break opportunities after each dot, so long
+    /// names wrap at label boundaries instead of being hyphenated mid-label.
+    /// For display only: never copy or send this string.
+    static func wrappable(_ domain: String) -> String {
+        domain.replacingOccurrences(of: ".", with: ".\u{200B}")
+    }
 }
 
 nonisolated enum DeviceName {

@@ -71,7 +71,7 @@ struct QueryLogMapperTests {
     @Test func catalogResolvesBuiltInAndListNames() {
         let catalog = FilterListCatalog(FilterStatusDTO(
             enabled: true, filters: [FilterDTO(id: 1, name: "AdGuard DNS filter", enabled: true, rulesCount: 1)],
-            whitelistFilters: nil
+            whitelistFilters: nil, userRules: nil
         ))
         #expect(catalog.name(for: 1) == "AdGuard DNS filter")
         #expect(catalog.name(for: 0) == "Benutzerdefinierte Regeln")

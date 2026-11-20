@@ -1,10 +1,13 @@
 import Foundation
+import Synchronization
 
 /// DEMO DATA ONLY. Generates deterministic sample data so the app can be
 /// explored without a server. Every screen showing this data is labeled
 /// "Demo" and it is never mixed with live data.
 struct DemoAdGuardRepository: AdGuardRepository {
     var calendar: Calendar = .current
+    /// In-memory user rules so rule changes can be tried out in the demo.
+    private let userRules = DemoUserRules()
 
     var isDemo: Bool { true }
 
@@ -43,6 +46,14 @@ struct DemoAdGuardRepository: AdGuardRepository {
         DemoClients.serviceNames
     }
 
+    func fetchUserRules() async throws(APIError) -> [String] {
+        userRules.rules.withLock { $0 }
+    }
+
+    func replaceUserRules(_ rules: [String]) async throws(APIError) {
+        userRules.rules.withLock { $0 = rules }
+    }
+
     /// Hourly sample curve with a daytime peak; totals are derived from the series.
     static func sampleStats() -> StatsDTO {
         let hours = 0..<24
@@ -78,4 +89,13 @@ struct DemoAdGuardRepository: AdGuardRepository {
     private static func sample(_ values: KeyValuePairs<String, Double>) -> [[String: Double]] {
         values.sorted { $0.value > $1.value }.map { [$0.key: $0.value] }
     }
+}
+
+/// DEMO DATA ONLY. Shared, lock-protected storage for the demo's user rules.
+private final class DemoUserRules: Sendable {
+    let rules = Mutex<[String]>([
+        "! Demo-Regeln",
+        "||tracking.example.net^$important",
+        "@@||app-measurement.com^$important",
+    ])
 }

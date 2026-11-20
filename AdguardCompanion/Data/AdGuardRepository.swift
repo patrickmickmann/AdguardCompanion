@@ -13,6 +13,10 @@ protocol AdGuardRepository: Sendable {
     func fetchClients() async throws(APIError) -> [NetworkClient]
     /// Blocked service names by ID, e.g. "youtube" → "YouTube".
     func fetchBlockedServiceNames() async throws(APIError) -> [String: String]
+    /// User-defined filtering rules, one rule or comment per line.
+    func fetchUserRules() async throws(APIError) -> [String]
+    /// Replaces all user-defined filtering rules.
+    func replaceUserRules(_ rules: [String]) async throws(APIError)
 }
 
 /// Production repository backed by the AdGuard Home REST API.
@@ -62,5 +66,14 @@ struct LiveAdGuardRepository: AdGuardRepository {
             names[id] = name
         }
         return names
+    }
+
+    func fetchUserRules() async throws(APIError) -> [String] {
+        let dto: FilterStatusDTO = try await client.get(.filteringStatus)
+        return dto.userRules ?? []
+    }
+
+    func replaceUserRules(_ rules: [String]) async throws(APIError) {
+        try await client.post(.setRules, body: SetRulesRequestDTO(rules: rules))
     }
 }

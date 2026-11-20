@@ -12,6 +12,8 @@ nonisolated struct Endpoint: Sendable, Equatable {
     static let stats = Endpoint(path: "control/stats")
     /// `GET /control/filtering/status` – filter lists and filtering settings.
     static let filteringStatus = Endpoint(path: "control/filtering/status")
+    /// `POST /control/filtering/set_rules` – replaces all user-defined rules.
+    static let setRules = Endpoint(path: "control/filtering/set_rules")
     /// `GET /control/clients` – configured and automatically discovered clients.
     static let clients = Endpoint(path: "control/clients")
     /// `GET /control/blocked_services/all` – services available for blocking.
