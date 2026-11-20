@@ -42,3 +42,52 @@ final class DemoProtection: Sendable {
         }
     }
 }
+
+/// DEMO DATA ONLY. Lock-protected filter list subscriptions.
+final class DemoFilterLists: Sendable {
+    private let settings: Mutex<FilterListSettings>
+
+    init(initial: FilterListSettings = DemoFilterLists.sample) {
+        settings = Mutex(initial)
+    }
+
+    static let sample = FilterListSettings(
+        isFilteringEnabled: true, updateIntervalHours: 24,
+        lists: [
+            FilterList(id: 1, name: "AdGuard DNS filter",
+                       url: "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt",
+                       kind: .blocklist, isEnabled: true, ruleCount: 74_812,
+                       lastUpdated: .now.addingTimeInterval(-3 * 3600)),
+            FilterList(id: 2, name: "AdAway Default Blocklist",
+                       url: "https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt",
+                       kind: .blocklist, isEnabled: false, ruleCount: 6_540,
+                       lastUpdated: .now.addingTimeInterval(-26 * 3600)),
+            FilterList(id: 3, name: "Eigene Ausnahmen", url: "https://example.org/allowlist.txt",
+                       kind: .allowlist, isEnabled: true, ruleCount: 12,
+                       lastUpdated: .now.addingTimeInterval(-3 * 3600)),
+        ]
+    )
+
+    func current() -> FilterListSettings { settings.withLock { $0 } }
+
+    func apply(_ change: FilterListChange) {
+        settings.withLock { settings in
+            var lists = settings.lists
+            var isFilteringEnabled = settings.isFilteringEnabled
+            switch change {
+            case let .setFilteringEnabled(isOn):
+                isFilteringEnabled = isOn
+            case let .setEnabled(list, isOn):
+                lists = lists.map { $0.id == list.id ? $0.with(isEnabled: isOn) : $0 }
+            case let .add(name, url, kind):
+                let id = (lists.map(\.id).max() ?? 0) + 1
+                lists.append(FilterList(id: id, name: name, url: url, kind: kind, isEnabled: true,
+                                        ruleCount: 1_000, lastUpdated: .now))
+            case let .remove(list):
+                lists.removeAll { $0.id == list.id }
+            }
+            settings = FilterListSettings(isFilteringEnabled: isFilteringEnabled,
+                                          updateIntervalHours: settings.updateIntervalHours, lists: lists)
+        }
+    }
+}

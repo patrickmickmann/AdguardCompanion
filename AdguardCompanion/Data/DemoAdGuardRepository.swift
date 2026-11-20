@@ -9,6 +9,7 @@ struct DemoAdGuardRepository: AdGuardRepository {
     private let userRules = DemoUserRules()
     /// In-memory protection switches for the demo.
     private let protection = DemoProtection()
+    private let filterLists = DemoFilterLists()
 
     var isDemo: Bool { true }
 
@@ -66,6 +67,16 @@ struct DemoAdGuardRepository: AdGuardRepository {
     func updateProtection(_ change: ProtectionChange) async throws(APIError) {
         protection.apply(change)
     }
+
+    func fetchFilterListSettings() async throws(APIError) -> FilterListSettings {
+        filterLists.current()
+    }
+
+    func updateFilterLists(_ change: FilterListChange, current: FilterListSettings) async throws(APIError) {
+        filterLists.apply(change)
+    }
+
+    func refreshFilterLists(_ kind: FilterList.Kind) async throws(APIError) -> Int { 0 }
 
     /// Hourly sample curve with a daytime peak; totals are derived from the series.
     static func sampleStats() -> StatsDTO {

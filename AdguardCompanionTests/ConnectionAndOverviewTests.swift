@@ -116,6 +116,31 @@ final class StubRepository: AdGuardRepository {
         case let .safeSearch(isOn): protection.safeSearch = isOn
         }
     }
+
+    var filterLists = FilterListSettings(isFilteringEnabled: true, updateIntervalHours: 12, lists: [
+        FilterList(id: 1, name: "List", url: "https://a.test/list.txt", kind: .blocklist, isEnabled: true,
+                   ruleCount: 10, lastUpdated: nil),
+    ])
+    var filterListChanges: [FilterListChange] = []
+
+    func fetchFilterListSettings() async throws(APIError) -> FilterListSettings {
+        if let failure { throw failure }
+        return filterLists
+    }
+
+    func updateFilterLists(_ change: FilterListChange, current: FilterListSettings) async throws(APIError) {
+        if let failure { throw failure }
+        filterListChanges.append(change)
+        guard !ignoresRuleChanges else { return }
+        let demo = DemoFilterLists(initial: filterLists)
+        demo.apply(change)
+        filterLists = demo.current()
+    }
+
+    func refreshFilterLists(_ kind: FilterList.Kind) async throws(APIError) -> Int {
+        if let failure { throw failure }
+        return kind == .blocklist ? 2 : 1
+    }
 }
 
 @MainActor

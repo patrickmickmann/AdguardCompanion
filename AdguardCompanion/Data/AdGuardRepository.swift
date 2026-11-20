@@ -19,6 +19,11 @@ protocol AdGuardRepository: Sendable {
     func replaceUserRules(_ rules: [String]) async throws(APIError)
     func fetchProtectionSettings() async throws(APIError) -> ProtectionSettings
     func updateProtection(_ change: ProtectionChange) async throws(APIError)
+    func fetchFilterListSettings() async throws(APIError) -> FilterListSettings
+    /// `current` provides values the API requires but the change keeps, such as the update interval.
+    func updateFilterLists(_ change: FilterListChange, current: FilterListSettings) async throws(APIError)
+    /// Returns how many lists were updated.
+    func refreshFilterLists(_ kind: FilterList.Kind) async throws(APIError) -> Int
 }
 
 /// Production repository backed by the AdGuard Home REST API.

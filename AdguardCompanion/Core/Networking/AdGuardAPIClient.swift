@@ -36,6 +36,24 @@ nonisolated struct AdGuardAPIClient: Sendable {
     @concurrent
     func write(_ endpoint: Endpoint, method: WriteMethod = .post,
                body: (any Encodable & Sendable)? = nil) async throws(APIError) {
+        _ = try await send(writeRequest(endpoint, method: method, body: body))
+    }
+
+    /// Write request whose JSON response is decoded, e.g. a refresh result.
+    @concurrent
+    func write<Response: Decodable & Sendable>(
+        _ endpoint: Endpoint, body: (any Encodable & Sendable)?, returning: Response.Type
+    ) async throws(APIError) -> Response {
+        let data = try await send(writeRequest(endpoint, method: .post, body: body))
+        do {
+            return try JSONDecoder.adGuard.decode(Response.self, from: data)
+        } catch {
+            throw .decodingFailed
+        }
+    }
+
+    private func writeRequest(_ endpoint: Endpoint, method: WriteMethod,
+                              body: (any Encodable & Sendable)?) throws(APIError) -> URLRequest {
         var request = makeRequest(endpoint, method: method.rawValue)
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -45,12 +63,15 @@ nonisolated struct AdGuardAPIClient: Sendable {
                 throw .invalidInput
             }
         }
-        _ = try await send(request)
+        return request
     }
 
     private func makeRequest(_ endpoint: Endpoint, method: String) -> URLRequest {
         var request = URLRequest(url: endpoint.url(relativeTo: baseURL))
         request.httpMethod = method
+        if let timeout = endpoint.timeout {
+            request.timeoutInterval = timeout
+        }
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(credentials.authorizationHeaderValue, forHTTPHeaderField: "Authorization")
         return request

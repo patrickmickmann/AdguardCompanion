@@ -4,8 +4,10 @@ import SwiftUI
 /// individual protection features. Every switch shows the server's state.
 struct ProtectionScreen: View {
     @State private var model: ProtectionModel
+    private let repository: any AdGuardRepository
 
     init(repository: any AdGuardRepository) {
+        self.repository = repository
         _model = State(initialValue: ProtectionModel(repository: repository))
     }
 
@@ -41,6 +43,17 @@ struct ProtectionScreen: View {
                 }
                 ProtectionStatusSection(settings: settings, model: model)
                 ProtectionFeaturesSection(isProtectionOn: settings.protection == .enabled, model: model)
+                Section("Filter") {
+                    NavigationLink {
+                        FilterListsScreen(repository: repository)
+                    } label: {
+                        Label {
+                            Text("Filterlisten")
+                        } icon: {
+                            IconTile(systemImage: "list.bullet.rectangle.fill", color: AppColor.protection)
+                        }
+                    }
+                }
             }
             .refreshable { await model.load() }
         } else if let error = model.loadError {

@@ -98,7 +98,7 @@ struct SetRulesRequestTests {
             #expect(request.httpMethod == "POST")
             #expect(request.url?.path() == "/control/filtering/set_rules")
             #expect(request.value(forHTTPHeaderField: "Content-Type") == "application/json")
-            let body = try #require(request.httpBodyStream.map(Self.read))
+            let body = RequestBody.read(request)
             let json = try JSONSerialization.jsonObject(with: body) as? [String: [String]]
             #expect(json == ["rules": ["||a.com^$important"]])
             return StubURLProtocol.respond(request, status: 200, body: "OK\n")
@@ -113,18 +113,5 @@ struct SetRulesRequestTests {
         let json = Data(#"{"enabled":true,"user_rules":["||a.com^",""]}"#.utf8)
         let dto = try JSONDecoder.adGuard.decode(FilterStatusDTO.self, from: json)
         #expect(dto.userRules == ["||a.com^", ""])
-    }
-
-    private static func read(_ stream: InputStream) -> Data {
-        stream.open()
-        defer { stream.close() }
-        var data = Data()
-        var buffer = [UInt8](repeating: 0, count: 1024)
-        while stream.hasBytesAvailable {
-            let count = stream.read(&buffer, maxLength: buffer.count)
-            guard count > 0 else { break }
-            data.append(buffer, count: count)
-        }
-        return data
     }
 }

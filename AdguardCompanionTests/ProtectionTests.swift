@@ -55,11 +55,7 @@ struct ProtectionModelTests {
 
 struct ProtectionRequestTests {
     private func repository(host: String) throws -> LiveAdGuardRepository {
-        LiveAdGuardRepository(client: AdGuardAPIClient(
-            baseURL: try #require(URL(string: "https://\(host)")),
-            credentials: ServerCredentials(username: "u", password: "p"),
-            session: StubURLProtocol.makeSession()
-        ))
+        try RequestBody.repository(host: host)
     }
 
     @Test func pauseSendsDurationInMilliseconds() async throws {
@@ -67,7 +63,7 @@ struct ProtectionRequestTests {
         StubURLProtocol.register(host: host) { request in
             #expect(request.httpMethod == "POST")
             #expect(request.url?.path() == "/control/protection")
-            let json = try JSONSerialization.jsonObject(with: Self.body(of: request)) as? [String: Any]
+            let json = try JSONSerialization.jsonObject(with: RequestBody.read(request)) as? [String: Any]
             #expect(json?["enabled"] as? Bool == false)
             #expect(json?["duration"] as? Int == 600_000)
             return StubURLProtocol.respond(request, status: 200, body: "")
@@ -85,7 +81,7 @@ struct ProtectionRequestTests {
             }
             #expect(request.httpMethod == "PUT")
             #expect(request.url?.path() == "/control/safesearch/settings")
-            let values = try JSONDecoder().decode([String: Bool].self, from: Self.body(of: request))
+            let values = try JSONDecoder().decode([String: Bool].self, from: RequestBody.read(request))
             sent.withLock { $0 = values }
             return StubURLProtocol.respond(request, status: 200, body: "")
         }
@@ -101,20 +97,5 @@ struct ProtectionRequestTests {
             return StubURLProtocol.respond(request, status: 200, body: "OK")
         }
         try await repository(host: host).updateProtection(.safeBrowsing(true))
-    }
-
-    private static func body(of request: URLRequest) -> Data {
-        if let body = request.httpBody { return body }
-        guard let stream = request.httpBodyStream else { return Data() }
-        stream.open()
-        defer { stream.close() }
-        var data = Data()
-        var buffer = [UInt8](repeating: 0, count: 1024)
-        while stream.hasBytesAvailable {
-            let count = stream.read(&buffer, maxLength: buffer.count)
-            guard count > 0 else { break }
-            data.append(buffer, count: count)
-        }
-        return data
     }
 }

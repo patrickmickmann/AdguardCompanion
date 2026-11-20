@@ -5,6 +5,9 @@ import Foundation
 nonisolated struct Endpoint: Sendable, Equatable {
     let path: String
     var queryItems: [URLQueryItem] = []
+    /// Overrides the idle timeout for operations that answer only after
+    /// downloading filter lists.
+    var timeout: TimeInterval?
 
     /// `GET /control/status` – server status and general settings.
     static let status = Endpoint(path: "control/status")
@@ -27,6 +30,12 @@ nonisolated struct Endpoint: Sendable, Equatable {
     /// `GET /control/safesearch/status` and `PUT /control/safesearch/settings`.
     static let safeSearchStatus = Endpoint(path: "control/safesearch/status")
     static let safeSearchSettings = Endpoint(path: "control/safesearch/settings")
+    /// Filter list management under `/control/filtering/…` (all `POST`).
+    static let filteringConfig = Endpoint(path: "control/filtering/config")
+    static let addFilterURL = Endpoint(path: "control/filtering/add_url", timeout: NetworkPolicy.longOperationTimeout)
+    static let removeFilterURL = Endpoint(path: "control/filtering/remove_url")
+    static let setFilterURL = Endpoint(path: "control/filtering/set_url", timeout: NetworkPolicy.longOperationTimeout)
+    static let refreshFilters = Endpoint(path: "control/filtering/refresh", timeout: NetworkPolicy.longOperationTimeout)
     /// `GET /control/clients` – configured and automatically discovered clients.
     static let clients = Endpoint(path: "control/clients")
     /// `GET /control/blocked_services/all` – services available for blocking.

@@ -17,8 +17,12 @@ nonisolated extension URLSession {
 }
 
 nonisolated enum NetworkPolicy {
+    /// Idle timeout for ordinary requests, so an unreachable server fails fast.
     static let requestTimeout: TimeInterval = 10
-    static let resourceTimeout: TimeInterval = 20
+    /// Upper bound for any request, including long-running operations.
+    static let resourceTimeout: TimeInterval = 150
+    /// Operations where AdGuard Home downloads filter lists before it answers.
+    static let longOperationTimeout: TimeInterval = 120
 }
 
 /// Prevents the Authorization header from being forwarded to another origin

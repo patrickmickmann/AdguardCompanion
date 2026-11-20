@@ -63,6 +63,8 @@ nonisolated struct QueryLogWhoisDTO: Decodable, Sendable {
 /// `components/schemas/FilterStatus`
 nonisolated struct FilterStatusDTO: Decodable, Sendable {
     let enabled: Bool?
+    /// Update interval of the filter lists in hours.
+    var interval: Int? = nil
     let filters: [FilterDTO]?
     let whitelistFilters: [FilterDTO]?
     let userRules: [String]?
@@ -79,4 +81,7 @@ nonisolated struct FilterDTO: Decodable, Sendable {
     let name: String?
     let enabled: Bool?
     let rulesCount: Int?
+    var url: String? = nil
+    /// ISO 8601, e.g. "2018-10-30T12:18:57+03:00".
+    var lastUpdated: String? = nil
 }
