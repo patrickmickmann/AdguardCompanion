@@ -13,3 +13,7 @@ build/
 
 # Personal signing values
 Config/Local.xcconfig
+
+# Local AI and product notes (not part of the app)
+CLAUDE.md
+MASTERPROMPT.md
