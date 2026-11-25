@@ -6,6 +6,15 @@ gebaut mit SwiftUI im Stil der Apple-Systemapps.
 
 > Privates Projekt, nicht mit AdGuard verbunden oder von AdGuard unterstützt.
 
+<p align="center">
+  <img src="docs/screenshots/overview.png" width="19%" alt="Übersicht mit Schutzstatus und Anfrageverlauf">
+  <img src="docs/screenshots/activity.png" width="19%" alt="Aktivität mit Query-Log">
+  <img src="docs/screenshots/clients.png" width="19%" alt="Clients im Netzwerk">
+  <img src="docs/screenshots/protection.png" width="19%" alt="Schutzfunktionen">
+  <img src="docs/screenshots/settings.png" width="19%" alt="Einstellungen">
+</p>
+<p align="center"><sub>Übersicht · Aktivität · Clients · Schutz · Einstellungen (Demo-Modus mit Beispieldaten)</sub></p>
+
 ## Funktionen
 
 **Übersicht**
