@@ -18,7 +18,7 @@ struct ClientsMapperTests {
     @Test func mergesConfiguredAndDiscoveredWithoutDuplicates() {
         let dto = ClientsDTO(
             clients: [persistent("Laptop", ids: ["10.0.0.2", "fd00::2"])],
-            autoClients: [runtime("10.0.0.2", name: "laptop.fritz.box"), runtime("10.0.0.3", name: "iPad.fritz.box")]
+            autoClients: [runtime("10.0.0.2", name: "laptop.home.arpa"), runtime("10.0.0.3", name: "iPad.home.arpa")]
         )
         let clients = ClientsMapper.map(dto, topClients: [])
         #expect(clients.map(\.name) == ["iPad", "Laptop"])
@@ -40,7 +40,7 @@ struct ClientsMapperTests {
 
     @Test func mergesDualStackDiscoveredDevicesByName() {
         let dto = ClientsDTO(clients: nil, autoClients: [
-            runtime("10.0.0.5", name: "PC.fritz.box"), runtime("fd00::5", name: "PC.fritz.box"),
+            runtime("10.0.0.5", name: "PC.home.arpa"), runtime("fd00::5", name: "PC.home.arpa"),
             runtime("10.0.0.6", name: nil), runtime("10.0.0.7", name: nil),
         ])
         let top = [RankedEntry(name: "10.0.0.5", count: 10), RankedEntry(name: "fd00::5", count: 5)]
@@ -53,8 +53,8 @@ struct ClientsMapperTests {
 
     @Test func keepsDistinctDevicesWithSameNameApart() {
         let dto = ClientsDTO(clients: nil, autoClients: [
-            runtime("10.0.0.20", name: "iPhone.fritz.box"), runtime("10.0.0.21", name: "iPhone.fritz.box"),
-            runtime("fd00::20", name: "iPhone.fritz.box"),
+            runtime("10.0.0.20", name: "iPhone.home.arpa"), runtime("10.0.0.21", name: "iPhone.home.arpa"),
+            runtime("fd00::20", name: "iPhone.home.arpa"),
         ])
         let clients = ClientsMapper.map(dto, topClients: [])
         // Two IPv4 devices stay separate; the IPv6 address is ambiguous and stays on its own.
@@ -133,7 +133,7 @@ struct ClientPresentationTests {
         let model = ClientsModel(repository: StubRepository())
         await model.load()
         #expect(!model.configured.isEmpty)
-        model.searchText = "178.23"
+        model.searchText = "1.23"
         #expect(model.configured.map(\.name) == ["Kinder-iPad"])
         #expect(model.discovered.isEmpty)
     }

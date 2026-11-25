@@ -1,0 +1,8 @@
+// Copy this file to Config/Local.xcconfig and fill in your own values.
+// Local.xcconfig is git-ignored.
+
+// Your Apple Developer Team ID (Xcode > Settings > Accounts).
+DEVELOPMENT_TEAM = ABCDE12345
+
+// A reverse-DNS prefix you own; the app becomes <prefix>.AdguardCompanion.
+BUNDLE_ID_PREFIX = com.yourname

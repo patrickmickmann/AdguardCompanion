@@ -83,5 +83,8 @@ struct ConnectionStore {
 }
 
 extension KeychainStore {
-    static let serverCredentials = KeychainStore(service: "com.example.AdguardCompanion.server")
+    /// Scoped to the app's bundle identifier, so every installation keeps its own entry.
+    static let serverCredentials = KeychainStore(
+        service: "\(Bundle.main.bundleIdentifier ?? "AdguardCompanion").server"
+    )
 }

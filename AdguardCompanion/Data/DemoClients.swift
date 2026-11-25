@@ -22,8 +22,8 @@ nonisolated enum DemoClients {
             ),
         ],
         autoClients: [
-            RuntimeClientDTO(ip: "192.168.1.12", name: "iPhone.fritz.box", source: "rDNS", whoisInfo: nil),
-            RuntimeClientDTO(ip: "192.168.1.30", name: "Apple-TV.fritz.box", source: "rDNS", whoisInfo: nil),
+            RuntimeClientDTO(ip: "192.168.1.12", name: "iPhone.home.arpa", source: "rDNS", whoisInfo: nil),
+            RuntimeClientDTO(ip: "192.168.1.30", name: "Apple-TV.home.arpa", source: "rDNS", whoisInfo: nil),
             RuntimeClientDTO(ip: "192.168.1.45", name: "", source: "ARP", whoisInfo: nil),
             RuntimeClientDTO(ip: "192.168.1.60", name: "drucker", source: "DHCP", whoisInfo: nil),
         ]

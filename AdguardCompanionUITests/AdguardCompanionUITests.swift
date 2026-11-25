@@ -1,10 +1,3 @@
-//
-//  AdguardCompanionUITests.swift
-//  AdguardCompanionUITests
-//
-//  Created by Developer on 20.11.26.
-//
-
 import XCTest
 
 final class AdguardCompanionUITests: XCTestCase {

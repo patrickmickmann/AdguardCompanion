@@ -66,8 +66,12 @@ struct DNSRewritesScreen: View {
             } label: {
                 VStack(alignment: .leading, spacing: Spacing.xxs) {
                     Text(rewrite.domain).foregroundStyle(model.isOn(rewrite) ? .primary : .secondary)
-                    Label(rewrite.answer, systemImage: "arrow.turn.down.right")
-                        .font(AppFont.technicalSmall)
+                    // An explicit HStack: inside a toggle label, a Label is laid out vertically.
+                    HStack(spacing: Spacing.xxs) {
+                        Image(systemName: "arrow.turn.down.right").accessibilityHidden(true)
+                        Text(rewrite.answer)
+                    }
+                    .font(AppFont.technicalSmall)
                         .foregroundStyle(.secondary)
                 }
             }
